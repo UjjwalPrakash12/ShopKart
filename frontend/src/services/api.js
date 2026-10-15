@@ -9,6 +9,15 @@ const api = axios.create({
   },
 });
 
+// Interceptor: Attach Bearer token for cross-domain deployments (e.g. Vercel <-> Render)
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('shopkart_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Customer Authentication Services (Lab 01 & 02)
 export const registerCustomer = async (customerData) => {
   const response = await api.post('/customers/register', customerData);

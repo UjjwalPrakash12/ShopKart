@@ -42,9 +42,12 @@ const register = async (req, res) => {
 
     await newCustomer.save();
 
+    const token = generateTokenAndSetCookie(res, newCustomer._id);
+
     return res.status(201).json({
       success: true,
       message: 'Customer registered successfully',
+      token,
       customer: {
         _id: newCustomer._id,
         fullName: newCustomer.fullName,
@@ -95,11 +98,18 @@ const login = async (req, res) => {
     }
 
     // Generate JWT and store in HttpOnly cookie
-    generateTokenAndSetCookie(res, customer._id);
+    const token = generateTokenAndSetCookie(res, customer._id);
 
     return res.status(200).json({
       success: true,
       message: 'Login successful',
+      token,
+      customer: {
+        _id: customer._id,
+        fullName: customer.fullName,
+        email: customer.email,
+        phone: customer.phone,
+      },
     });
   } catch (error) {
     console.error('Error in customer login:', error.message);
@@ -116,10 +126,17 @@ const getProfile = async (req, res) => {
   try {
     // req.user is attached by auth.middleware.js
     return res.status(200).json({
+      success: true,
       _id: req.user._id,
       fullName: req.user.fullName,
       email: req.user.email,
       phone: req.user.phone,
+      customer: {
+        _id: req.user._id,
+        fullName: req.user.fullName,
+        email: req.user.email,
+        phone: req.user.phone,
+      },
     });
   } catch (error) {
     console.error('Error in getProfile:', error.message);

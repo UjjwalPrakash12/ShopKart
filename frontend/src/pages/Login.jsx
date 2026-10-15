@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { refreshUser } = useAuth();
+  const { login, refreshUser } = useAuth();
   const { toggleTheme, isDark } = useTheme();
 
   const [formData, setFormData] = useState({
@@ -40,10 +40,14 @@ const Login = () => {
     setErrorMessage('');
 
     try {
-      await loginCustomer({
+      const response = await loginCustomer({
         email: formData.email.trim(),
         password: formData.password,
       });
+      if (response?.token) {
+        localStorage.setItem('shopkart_token', response.token);
+      }
+      login(response);
       await refreshUser();
       const destination = location.state?.from?.pathname || '/home';
       navigate(destination, { replace: true });

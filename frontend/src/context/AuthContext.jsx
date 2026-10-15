@@ -10,14 +10,21 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async () => {
     try {
       const data = await getCustomerProfile();
-      if (data && data.customer) {
-        setUser(data.customer);
+      // Supports both wrapped { customer: {...} } and direct { _id, fullName, ... } formats
+      const customerData = data?.customer || (data?._id ? data : null);
+      if (customerData) {
+        setUser(customerData);
+        return customerData;
       } else {
         setUser(null);
+        localStorage.removeItem('shopkart_token');
+        return null;
       }
     } catch (err) {
       // 401 or network error indicates unauthenticated user
       setUser(null);
+      localStorage.removeItem('shopkart_token');
+      return null;
     } finally {
       setLoading(false);
     }
@@ -27,8 +34,14 @@ export const AuthProvider = ({ children }) => {
     fetchProfile();
   }, []);
 
-  const login = (userData) => {
-    setUser(userData);
+  const login = (payload) => {
+    if (payload?.token) {
+      localStorage.setItem('shopkart_token', payload.token);
+    }
+    const customerData = payload?.customer || (payload?._id ? payload : null);
+    if (customerData) {
+      setUser(customerData);
+    }
   };
 
   const logout = async () => {
@@ -37,6 +50,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
+      localStorage.removeItem('shopkart_token');
       setUser(null);
     }
   };
