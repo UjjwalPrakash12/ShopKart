@@ -14,12 +14,27 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/shopkart';
 
+// Enable trust proxy for secure HTTPS cookies behind reverse proxies (Render, Railway, Heroku)
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or Postman)
+      if (!origin) return callback(null, true);
+      // Allow localhost, custom frontend URL, and any vercel preview deployment
+      if (
+        origin.startsWith('http://localhost') ||
+        origin.endsWith('.vercel.app') ||
+        (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL)
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Permissive fallback for seamless deployment
+    },
     credentials: true, // Allow cookies to be sent across origins
   })
 );

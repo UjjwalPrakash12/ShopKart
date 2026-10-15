@@ -9,8 +9,8 @@ const generateTokenAndSetCookie = (res, customerId) => {
 
   res.cookie('token', token, {
     httpOnly: true, // Prevents client-side JS from accessing the cookie (mitigates XSS)
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-    sameSite: 'strict', // Protects against CSRF attacks
+    secure: process.env.NODE_ENV === 'production', // Required when sameSite is 'none' over HTTPS
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Supports cross-site Vercel <-> Render in production
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   });
 

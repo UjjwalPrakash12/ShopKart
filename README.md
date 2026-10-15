@@ -186,6 +186,26 @@ npm test
 
 ---
 
+## 🌐 Production Deployment Guide
+
+### 1. Database (MongoDB Atlas)
+- Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+- Whitelist IP access (`0.0.0.0/0`) and copy the connection string.
+
+### 2. Backend (Render / Railway)
+- Create a new **Web Service** on [Render](https://render.com) pointing to root directory `backend`.
+- Build Command: `npm install`
+- Start Command: `node index.js`
+- Set environment variables (`MONGO_URI`, `JWT_SECRET`, `NODE_ENV=production`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`).
+
+### 3. Frontend (Vercel)
+- Import repository on [Vercel](https://vercel.com) with root directory `frontend`.
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Set `VITE_API_BASE_URL` to your live Render backend URL and `VITE_RAZORPAY_KEY`.
+
+---
+
 ## 🔒 Security & Best Practices
 
 - Environment configuration files (`.env`, `*.env`) and secret keys are excluded from git version control via `.gitignore`.
