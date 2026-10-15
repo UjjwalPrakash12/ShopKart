@@ -1,4 +1,13 @@
 require('dotenv').config();
+const dns = require('dns');
+
+// Fix for Node.js querySrv EBADRESP caused by local router/ISP DNS failing SRV lookups
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (err) {
+  // Fallback if system prevents custom resolver
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
