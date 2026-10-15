@@ -47,12 +47,12 @@ const CartItem = ({ item }) => {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-white rounded-2xl border border-slate-200/80 shadow-card hover:shadow-elevated transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="p-4 sm:p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-card hover:shadow-elevated transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       {/* Product Image & Details */}
       <div className="flex items-center space-x-4 min-w-0 flex-1">
         <Link
           to={`/products/${product._id}`}
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-50 overflow-hidden flex-shrink-0 border border-slate-200/60 p-1"
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 border border-slate-200/60 dark:border-slate-800 p-1"
         >
           <img
             src={product.image}
@@ -68,11 +68,11 @@ const CartItem = ({ item }) => {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center space-x-2">
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
               {product.category}
             </span>
             {product.stock <= 5 && (
-              <span className="text-[10px] text-amber-600 font-semibold">
+              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">
                 Only {product.stock} left
               </span>
             )}
@@ -80,17 +80,17 @@ const CartItem = ({ item }) => {
 
           <Link
             to={`/products/${product._id}`}
-            className="text-sm sm:text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors line-clamp-1 mt-1 block"
+            className="text-sm sm:text-base font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors line-clamp-1 mt-1 block"
           >
             {product.name}
           </Link>
 
-          <p className="text-xs text-slate-500 mt-0.5">
-            Unit Price: <span className="font-semibold text-slate-800">₹{Number(product.price).toLocaleString('en-IN')}</span>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Unit Price: <span className="font-semibold text-slate-800 dark:text-slate-200">₹{Number(product.price).toLocaleString('en-IN')}</span>
           </p>
 
           {errorMessage && (
-            <p className="text-xs text-rose-600 font-medium mt-1 animate-fade-in">
+            <p className="text-xs text-rose-600 dark:text-rose-400 font-medium mt-1 animate-fade-in">
               {errorMessage}
             </p>
           )}
@@ -98,19 +98,19 @@ const CartItem = ({ item }) => {
       </div>
 
       {/* Stepper, Total & Remove */}
-      <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+      <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
         {/* Quantity Stepper */}
-        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200/80 rounded-xl p-1">
+        <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl p-1">
           <button
             onClick={handleDecrement}
             disabled={isMinQuantity || updating}
             title={isMinQuantity ? 'Minimum quantity is 1' : 'Decrease quantity'}
-            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm active:scale-95"
+            className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm active:scale-95"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
 
-          <span className="w-8 text-center text-xs font-bold text-slate-900">
+          <span className="w-8 text-center text-xs font-bold text-slate-900 dark:text-white">
             {updating ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto text-slate-500" /> : quantity}
           </span>
 
@@ -118,7 +118,7 @@ const CartItem = ({ item }) => {
             onClick={handleIncrement}
             disabled={isMaxStock || updating}
             title={isMaxStock ? `Max stock (${product.stock}) reached` : 'Increase quantity'}
-            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm active:scale-95"
+            className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
           </button>
@@ -126,8 +126,8 @@ const CartItem = ({ item }) => {
 
         {/* Item Total */}
         <div className="text-right min-w-[90px]">
-          <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Total</span>
-          <span className="font-display text-base sm:text-lg font-bold text-slate-950">
+          <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500 block">Total</span>
+          <span className="font-display text-base sm:text-lg font-bold text-slate-950 dark:text-white">
             ₹{itemTotal.toLocaleString('en-IN')}
           </span>
         </div>
@@ -137,7 +137,7 @@ const CartItem = ({ item }) => {
           onClick={handleRemove}
           disabled={updating}
           title="Remove from bag"
-          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer active:scale-95"
+          className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer active:scale-95"
         >
           <Trash2 className="w-4 h-4" />
         </button>
