@@ -1,206 +1,361 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Phone, Calendar, ShieldCheck, ShoppingBag, Heart, Clock, ArrowRight } from 'lucide-react';
+import { 
+  Sparkles, 
+  ArrowRight, 
+  ShieldCheck, 
+  Truck, 
+  RotateCcw, 
+  CreditCard, 
+  Compass, 
+  Star,
+  ChevronRight,
+  TrendingUp,
+  User,
+  ShoppingBag
+} from 'lucide-react';
 import Navbar from '../components/Navbar';
-import { getCustomerProfile } from '../services/api';
+import ProductCard from '../components/ProductCard';
+import { getCustomerProfile, getProducts, getWishlist } from '../services/api';
 
 const Home = () => {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState(null);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [wishlistIds, setWishlistIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
-    const fetchProfile = async () => {
+    const loadData = async () => {
       try {
-        const data = await getCustomerProfile();
-        if (isMounted) {
-          setCustomer(data);
-          setLoading(false);
+        // Fetch customer profile
+        const profile = await getCustomerProfile().catch(() => null);
+        if (isMounted) setCustomer(profile);
+
+        // Fetch wishlist if logged in
+        if (profile) {
+          const wl = await getWishlist().catch(() => null);
+          if (isMounted && wl && Array.isArray(wl.wishlist)) {
+            setWishlistIds(new Set(wl.wishlist.map((item) => item._id)));
+          }
+        }
+
+        // Fetch products for featured section
+        const prodData = await getProducts({}).catch(() => null);
+        if (isMounted && prodData && Array.isArray(prodData.products)) {
+          setFeaturedProducts(prodData.products.slice(0, 8));
         }
       } catch (err) {
-        console.error('Failed to fetch profile (unauthorized):', err);
-        if (isMounted) {
-          // If not logged in or session expired, redirect to /login
-          navigate('/login');
-        }
+        console.error('Home data load error:', err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchProfile();
+    loadData();
 
     return () => {
       isMounted = false;
     };
-  }, [navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center">
-        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-sm font-medium text-slate-600">Verifying session & loading ShopKart...</p>
-      </div>
-    );
-  }
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Global Navbar */}
+    <div className="min-h-screen bg-[#fafafa] flex flex-col">
       <Navbar customer={customer} onLogout={() => setCustomer(null)} />
 
-      {/* Main Dashboard Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* Welcome Banner */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-3xl shadow-xl text-white p-8 sm:p-10 mb-8">
-          <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border border-white/20">
-              <ShieldCheck className="w-4 h-4 text-emerald-300" />
-              <span>Customer Authenticated</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Welcome back, {customer?.fullName}! 👋
-            </h1>
-            <p className="mt-2 text-blue-100 text-sm sm:text-base leading-relaxed">
-              You are securely signed in. Explore your ShopKart dashboard, manage your profile, and browse upcoming items.
-            </p>
-          </div>
-          {/* Subtle Decorative Background Rings */}
-          <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/5 pointer-events-none"></div>
-          <div className="absolute right-20 -bottom-20 w-64 h-64 rounded-full bg-white/5 pointer-events-none"></div>
-        </div>
+      <main className="flex-1">
+        {/* HERO SECTION */}
+        <section className="relative overflow-hidden bg-slate-950 text-white pt-16 pb-24 sm:pt-24 sm:pb-32 px-4 sm:px-6 lg:px-8">
+          {/* Ambient Blurred Background Gradients */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-indigo-600/30 via-purple-600/20 to-pink-500/10 blur-[130px] rounded-full pointer-events-none"></div>
+          <div className="absolute -top-24 right-10 w-96 h-96 bg-blue-500/15 blur-[120px] rounded-full pointer-events-none"></div>
 
-        {/* Customer Profile Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          
-          {/* Profile Details (Task 3 core requirement) */}
-          <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center space-x-4 pb-6 border-b border-slate-100">
-                <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-bold">
-                  {customer?.fullName?.charAt(0).toUpperCase()}
+          <div className="relative max-w-7xl mx-auto">
+            {/* Top Tag Pill */}
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-indigo-300 mb-6">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+              <span>Spring / Summer 2026 Collection</span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* Left Column: Heading & CTAs */}
+              <div className="lg:col-span-7 space-y-6 text-left">
+                <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
+                  Curated Essentials. <br />
+                  <span className="bg-gradient-to-r from-indigo-300 via-white to-purple-300 bg-clip-text text-transparent">
+                    Engineered for Living.
+                  </span>
+                </h1>
+
+                <p className="text-slate-400 text-base sm:text-lg max-w-xl font-normal leading-relaxed">
+                  Discover a minimalist curation of premium tech, accessories, and daily companions. Verified checkout powered by Razorpay with nationwide express delivery.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <Link
+                    to="/products"
+                    className="inline-flex items-center space-x-2.5 px-6 py-3.5 rounded-full bg-white text-slate-950 text-sm font-bold hover:bg-slate-100 hover:shadow-glow-sm transition-all duration-200"
+                  >
+                    <span>Explore Products</span>
+                    <ArrowRight className="w-4 h-4 text-slate-950" />
+                  </Link>
+
+                  <Link
+                    to="/cart"
+                    className="inline-flex items-center space-x-2 px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 text-white text-sm font-semibold transition-all duration-200"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>View Shopping Bag</span>
+                  </Link>
+                </div>
+
+                {/* Social Proof Stats */}
+                <div className="pt-8 border-t border-white/10 flex items-center space-x-8 text-xs text-slate-400">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex text-amber-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                      ))}
+                    </div>
+                    <span className="font-semibold text-slate-200">4.9/5 Rating</span>
+                  </div>
+                  <div className="hidden sm:block w-px h-4 bg-white/20"></div>
+                  <div className="flex items-center space-x-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span className="font-semibold text-slate-200">100% Secure Checkout</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Hero Visual Showcase */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative mx-auto max-w-md lg:max-w-none rounded-3xl p-3 bg-gradient-to-b from-white/15 to-white/5 backdrop-blur-xl border border-white/15 shadow-2xl">
+                  <div className="relative rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-square bg-slate-900">
+                    <img
+                      src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1000&q=80"
+                      alt="Featured Headphones"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                    <div className="absolute bottom-5 inset-x-5 flex justify-between items-end">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-300">
+                          Featured of the Week
+                        </span>
+                        <h3 className="text-lg font-bold text-white mt-0.5">Studio Hi-Fi Wireless</h3>
+                        <p className="text-xs text-slate-300">Active Noise Cancellation & Spatial Audio</p>
+                      </div>
+                      <Link
+                        to="/products"
+                        className="px-3.5 py-1.5 rounded-full bg-white/90 hover:bg-white text-slate-950 text-xs font-bold shadow-md transition-transform active:scale-95"
+                      >
+                        Shop Now
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* LOGGED IN MEMBER BANNER (if authenticated) */}
+        {customer && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                  {customer.fullName?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900">{customer?.fullName}</h2>
-                  <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                    Active Account
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-sm font-bold text-slate-900">Welcome, {customer.fullName}</h2>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Active Member
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">{customer.email} • Verified Account</p>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-4">
-                <div className="flex items-center space-x-3 text-sm">
-                  <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <div className="overflow-hidden">
-                    <p className="text-xs text-slate-500 font-medium">Email Address</p>
-                    <p className="text-slate-800 font-semibold truncate">{customer?.email}</p>
-                  </div>
-                </div>
+              <div className="flex items-center space-x-3 text-xs w-full sm:w-auto">
+                <Link
+                  to="/products"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-colors shadow-sm"
+                >
+                  <Compass className="w-3.5 h-3.5" />
+                  <span>Browse Catalog</span>
+                </Link>
+                <Link
+                  to="/cart"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition-colors"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>My Cart</span>
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
 
-                <div className="flex items-center space-x-3 text-sm">
-                  <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">Phone Number</p>
-                    <p className="text-slate-800 font-semibold">{customer?.phone}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 text-sm">
-                  <Calendar className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">Account ID</p>
-                    <p className="text-slate-800 font-mono text-xs">{customer?._id}</p>
-                  </div>
-                </div>
+        {/* VALUE PROPOSITIONS STRIP */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm flex items-start space-x-4">
+              <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                <Truck className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">Express Delivery</h4>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Complimentary tracked shipping on all orders exceeding ₹999.
+                </p>
               </div>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-slate-100">
-              <div className="flex items-center text-xs text-slate-500 space-x-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                <span>Protected via HttpOnly Cookie Authentication</span>
+            <div className="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm flex items-start space-x-4">
+              <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">Razorpay Verified</h4>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Military-grade 256-bit SSL encrypted payments via Cards, UPI, & NetBanking.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm flex items-start space-x-4">
+              <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+                <RotateCcw className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">7-Day Free Returns</h4>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Not 100% satisfied? Return hassle-free with instant pickup from your doorstep.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm flex items-start space-x-4">
+              <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">Authentic Guarantee</h4>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Every product is 100% genuine, backed by full manufacturer warranty.
+                </p>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Quick Actions & Upcoming Labs Preview */}
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
+        {/* FEATURED / TRENDING PRODUCTS */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-slate-200/80 gap-4">
+            <div>
+              <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-indigo-600 mb-1">
+                <TrendingUp className="w-4 h-4" />
+                <span>Trending Right Now</span>
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
+                Featured Selection
+              </h2>
+            </div>
+
             <Link
               to="/products"
-              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-blue-300 transition-all group"
+              className="inline-flex items-center space-x-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors self-start"
             >
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <ShoppingBag className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-slate-900 text-base group-hover:text-blue-600 transition-colors">
-                  Product Catalog
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Browse products, inspect categories, and check real-time stock availability.
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-indigo-600 group-hover:text-blue-600">
-                <span>Browse Products Now</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
+              <span>View all products</span>
+              <ChevronRight className="w-4 h-4" />
             </Link>
-
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4">
-                  <Heart className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-slate-900 text-base">Shopping Cart & Wishlist</h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Save favorite items and manage your cart for seamless single-click checkouts.
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-rose-600">
-                <span>Coming in Lab 04</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-slate-900 text-base">Order History</h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Track ongoing shipments, review invoices, and manage past purchases.
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-600">
-                <span>Coming in Lab 05</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-slate-900 text-base">Payments & Checkout</h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Integrate online payment gateways and generate instant order confirmations.
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600">
-                <span>Coming in Lab 06</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-
           </div>
 
-        </div>
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="rounded-2xl border border-slate-200 p-4 space-y-4 animate-pulse bg-white">
+                  <div className="aspect-[4/5] bg-slate-100 rounded-xl"></div>
+                  <div className="h-4 bg-slate-100 rounded w-3/4"></div>
+                  <div className="h-3 bg-slate-100 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  initialWishlisted={wishlistIds.has(product._id)}
+                  onWishlistChange={(prodId, isSaved) => {
+                    setWishlistIds((prev) => {
+                      const updated = new Set(prev);
+                      if (isSaved) updated.add(prodId);
+                      else updated.delete(prodId);
+                      return updated;
+                    });
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
+              <p className="text-sm text-slate-500">No products available at the moment.</p>
+            </div>
+          )}
+        </section>
 
+        {/* EDITORIAL CALLOUT SECTION */}
+        <section className="bg-slate-900 text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="max-w-xl space-y-3">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-400">
+                Exclusive Member Experience
+              </span>
+              <h3 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight">
+                Seamless Checkout with Razorpay
+              </h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Enjoy instant payment authorization across Credit/Debit cards, UPI (Google Pay, PhonePe, Paytm), and NetBanking. With automated HMAC-SHA256 signature verification, your transactions are instant, safe, and verifiable.
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/products"
+                className="px-6 py-3.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold shadow-glow-sm transition-all"
+              >
+                Start Shopping Now
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
+
+      {/* FOOTER */}
+      <footer className="bg-white border-t border-slate-200 text-slate-600 text-xs py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center space-x-2">
+            <span className="font-display font-black text-slate-900 tracking-tight text-base">
+              SHOP<span className="text-indigo-600">KART</span>
+            </span>
+            <span className="text-slate-400">|</span>
+            <span className="text-slate-500">© 2026 ShopKart Inc. All rights reserved.</span>
+          </div>
+
+          <div className="flex items-center space-x-6 text-slate-500">
+            <Link to="/products" className="hover:text-slate-900 transition-colors">Catalog</Link>
+            <Link to="/cart" className="hover:text-slate-900 transition-colors">Cart</Link>
+            <Link to="/wishlist" className="hover:text-slate-900 transition-colors">Wishlist</Link>
+            <Link to="/checkout" className="hover:text-slate-900 transition-colors">Checkout</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

@@ -3,7 +3,39 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-800 font-sans;
+    @apply bg-[#fafafa] text-slate-900 font-sans tracking-[-0.01em];
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-xl border border-white/50 shadow-card;
+  }
+  
+  .glass-card {
+    @apply bg-white/90 backdrop-blur-md border border-slate-100 shadow-card hover:shadow-elevated transition-all duration-300;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }

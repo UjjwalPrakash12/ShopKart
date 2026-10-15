@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Tag, Package, AlertCircle, Heart, Loader2, ShoppingCart, Check } from 'lucide-react';
+import { ArrowUpRight, Heart, Loader2, ShoppingBag, Check } from 'lucide-react';
 import { toggleWishlist } from '../services/api';
 import { useCart } from '../context/CartContext';
 
@@ -32,7 +32,7 @@ const ProductCard = ({ product, initialWishlisted = false, onWishlistChange }) =
     } catch (err) {
       console.error('Wishlist action failed:', err);
       if (err.response && err.response.status === 401) {
-        setErrorMessage('Please login to save to wishlist');
+        setErrorMessage('Please login to save item');
       } else {
         setErrorMessage('Unable to save product');
       }
@@ -57,7 +57,7 @@ const ProductCard = ({ product, initialWishlisted = false, onWishlistChange }) =
       setTimeout(() => setCartSuccess(false), 2000);
     } else {
       if (res.status === 401) {
-        setErrorMessage('Please login to add to cart');
+        setErrorMessage('Please login to add to bag');
       } else {
         setErrorMessage(res.message);
       }
@@ -68,13 +68,16 @@ const ProductCard = ({ product, initialWishlisted = false, onWishlistChange }) =
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group relative">
-      {/* Product Image Container */}
-      <div className="relative aspect-square w-full bg-slate-100 overflow-hidden">
+    <div className="group relative bg-white rounded-2xl border border-slate-150/80 shadow-card hover:shadow-elevated transition-all duration-300 flex flex-col overflow-hidden">
+      {/* Product Image Stage */}
+      <Link
+        to={`/products/${product._id}`}
+        className="relative aspect-[4/5] w-full bg-slate-50/80 overflow-hidden flex items-center justify-center"
+      >
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src =
@@ -82,117 +85,115 @@ const ProductCard = ({ product, initialWishlisted = false, onWishlistChange }) =
           }}
         />
 
-        {/* Category Badge */}
-        <div className="absolute top-3 left-3">
-          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-md text-slate-700 shadow-sm border border-slate-200/50">
-            <Tag className="w-3 h-3 text-blue-600" />
-            <span>{product.category}</span>
+        {/* Ambient subtle vignette overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+        {/* Top Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 backdrop-blur-md text-slate-800 shadow-sm border border-slate-100/60">
+            {product.category}
           </span>
+          {product.stock > 0 && product.stock <= 5 && (
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-500/90 backdrop-blur-md text-white shadow-sm">
+              Only {product.stock} left
+            </span>
+          )}
+          {isOutOfStock && (
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-900/90 backdrop-blur-md text-white shadow-sm">
+              Sold out
+            </span>
+          )}
         </div>
 
-        {/* Quick Wishlist Icon Button */}
-        <div className="absolute top-3 right-3 flex items-center space-x-1">
+        {/* Floating Wishlist Button */}
+        <div className="absolute top-3 right-3 z-10">
           <button
             onClick={handleWishlistToggle}
             disabled={savingWishlist}
             title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
-            className={`p-2 rounded-full backdrop-blur-md transition-all shadow-sm flex items-center justify-center cursor-pointer ${
+            className={`w-9 h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${
               isWishlisted
-                ? 'bg-rose-50 text-rose-600 border border-rose-200'
-                : 'bg-white/90 text-slate-500 hover:text-rose-600 hover:bg-white border border-slate-200/50'
+                ? 'bg-rose-50 text-rose-600 border border-rose-200 scale-105'
+                : 'bg-white/80 text-slate-500 hover:text-rose-600 hover:bg-white hover:scale-105 border border-white/60'
             }`}
           >
             {savingWishlist ? (
-              <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-500" />
             ) : (
-              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
+              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current text-rose-600' : ''}`} />
             )}
           </button>
         </div>
-      </div>
 
-      {/* Inline Feedback Banner if Error */}
+        {/* Quick View Pill (reveals on desktop hover) */}
+        <div className="hidden sm:flex absolute bottom-3 inset-x-3 items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-10">
+          <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-slate-900 text-xs font-semibold shadow-md border border-slate-200/50">
+            <span>View Details</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </span>
+        </div>
+      </Link>
+
+      {/* Floating error toast if any */}
       {errorMessage && (
-        <div className="absolute top-14 left-2 right-2 z-20 p-2 rounded-lg bg-rose-600 text-white text-xs font-medium text-center shadow-lg animate-shake">
+        <div className="absolute top-14 inset-x-3 z-20 p-2 rounded-xl bg-slate-900/95 backdrop-blur-md text-white text-[11px] font-medium text-center shadow-lg animate-fade-in">
           {errorMessage}
         </div>
       )}
 
-      {/* Product Content */}
-      <div className="p-5 flex-1 flex flex-col justify-between">
+      {/* Card Info Details */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-white">
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-bold text-slate-900 text-base group-hover:text-blue-600 transition-colors line-clamp-1">
-              {product.name}
-            </h3>
-          </div>
-
-          <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-            {product.description}
-          </p>
-
-          <div className="mt-3">
-            {isOutOfStock ? (
-              <span className="inline-flex items-center space-x-1 text-xs font-semibold text-rose-600">
-                <AlertCircle className="w-3.5 h-3.5" />
-                <span>Out of stock</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center space-x-1 text-xs font-semibold text-emerald-600">
-                <Package className="w-3.5 h-3.5" />
-                <span>{product.stock} units left</span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 block font-medium">Price</span>
-            <span className="text-xl font-extrabold text-slate-900">
-              ₹{Number(product.price).toLocaleString('en-IN')}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex items-start justify-between gap-2">
             <Link
               to={`/products/${product._id}`}
-              className="inline-flex items-center justify-center space-x-1 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+              className="text-sm sm:text-base font-semibold text-slate-900 hover:text-indigo-600 transition-colors line-clamp-1 block"
             >
-              <span>View</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              {product.name}
             </Link>
-
-            {/* Task 7: Product Card Add to Cart button */}
-            <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || addingToCart}
-              className={`inline-flex items-center justify-center space-x-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold shadow-sm transition-all cursor-pointer ${
-                cartSuccess
-                  ? 'bg-emerald-600 text-white'
-                  : isOutOfStock
-                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
-            >
-              {addingToCart ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Adding...</span>
-                </>
-              ) : cartSuccess ? (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Added!</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="w-3.5 h-3.5" />
-                  <span>Add to Cart</span>
-                </>
-              )}
-            </button>
           </div>
+
+          <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+            {product.description}
+          </p>
+        </div>
+
+        <div className="mt-4 pt-3.5 border-t border-slate-100/90 flex items-center justify-between gap-3">
+          <div>
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Price</span>
+            <div className="font-display text-lg sm:text-xl font-bold text-slate-950 tracking-tight">
+              ₹{Number(product.price).toLocaleString('en-IN')}
+            </div>
+          </div>
+
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || addingToCart}
+            className={`inline-flex items-center justify-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+              cartSuccess
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : isOutOfStock
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'bg-slate-950 hover:bg-indigo-600 active:scale-95 text-white shadow-sm'
+            }`}
+          >
+            {addingToCart ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span className="hidden sm:inline">Adding</span>
+              </>
+            ) : cartSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>Added!</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Add</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

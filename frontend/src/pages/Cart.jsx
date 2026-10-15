@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ShoppingBag, ArrowRight, RefreshCw, AlertTriangle, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, ArrowRight, RefreshCw, AlertTriangle, ShieldCheck, ArrowLeft, Truck, Sparkles } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CartItem from '../components/CartItem';
 import { useCart } from '../context/CartContext';
@@ -10,7 +10,6 @@ const Cart = () => {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState(null);
   const { cartItems, loading, error, subtotal, totalUnits, itemCount, fetchCart } = useCart();
-  const [checkingOut, setCheckingOut] = useState(false);
 
   // Authenticate session for cart view
   useEffect(() => {
@@ -21,189 +20,198 @@ const Cart = () => {
       });
   }, [navigate]);
 
-  const handleProceedToCheckout = async () => {
-    // Navigate to the Checkout page where the payment flow will be handled
-    // In a full implementation you would gather shipping details and call the backend
-    // createPaymentOrder API, then invoke Razorpay checkout.
+  const handleProceedToCheckout = () => {
     navigate('/checkout');
   };
 
+  const freeDeliveryThreshold = 999;
+  const progressPercent = Math.min(100, Math.round((subtotal / freeDeliveryThreshold) * 100));
+  const amountNeeded = Math.max(0, freeDeliveryThreshold - subtotal);
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col">
       <Navbar customer={customer} onLogout={() => setCustomer(null)} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Breadcrumb */}
-        <div className="mb-6 flex items-center space-x-2 text-sm text-slate-500">
-          <Link to="/home" className="hover:text-blue-600 transition-colors">
-            Home
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Navigation Breadcrumbs */}
+        <div className="mb-6 flex items-center space-x-2 text-xs font-semibold text-slate-400">
+          <Link to="/home" className="hover:text-slate-900 transition-colors">
+            Discover
           </Link>
           <span>/</span>
-          <Link to="/products" className="hover:text-blue-600 transition-colors">
-            Products
+          <Link to="/products" className="hover:text-slate-900 transition-colors">
+            Collection
           </Link>
           <span>/</span>
-          <span className="text-slate-900 font-semibold">Shopping Cart</span>
+          <span className="text-slate-900 font-bold">Shopping Bag</span>
         </div>
 
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-6 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-8 border-b border-slate-200/80 gap-4">
           <div>
-            <div className="flex items-center space-x-2.5">
-              <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                <ShoppingCart className="w-5 h-5" />
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm">
+                <ShoppingBag className="w-5 h-5" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                My Cart
-              </h1>
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-600 block">
+                  Review & Checkout
+                </span>
+                <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
+                  Shopping Bag
+                </h1>
+              </div>
             </div>
-            <p className="text-sm text-slate-500 mt-1">
-              Review your items, adjust quantities, and proceed to checkout
-            </p>
           </div>
 
-          <div className="mt-4 sm:mt-0 text-xs font-semibold text-slate-600 bg-white px-4 py-2 rounded-full border border-slate-200 self-start shadow-sm flex items-center space-x-1.5">
-            <span>{totalUnits} items in cart</span>
+          <div className="text-xs font-bold text-slate-700 bg-white px-4 py-2 rounded-full border border-slate-200 self-start shadow-sm flex items-center space-x-1.5">
+            <span>{totalUnits} items in bag</span>
           </div>
         </div>
 
-        {/* 1. Loading State (Task 17) */}
+        {/* Loading State */}
         {loading && (
-          <div className="space-y-6 my-8">
-            <div className="flex items-center justify-center space-x-2 text-sm text-blue-600 font-medium">
+          <div className="space-y-6 my-12 text-center">
+            <div className="inline-flex items-center space-x-2 text-sm text-indigo-600 font-medium">
               <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Loading your cart...</span>
+              <span>Updating your shopping bag...</span>
             </div>
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
+            <div className="space-y-4 max-w-3xl mx-auto">
+              {[...Array(2)].map((_, i) => (
                 <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 animate-pulse flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-20 h-20 bg-slate-200 rounded-xl"></div>
+                    <div className="w-20 h-20 bg-slate-100 rounded-xl"></div>
                     <div className="space-y-2">
-                      <div className="h-4 bg-slate-200 rounded w-48"></div>
-                      <div className="h-3 bg-slate-200 rounded w-24"></div>
+                      <div className="h-4 bg-slate-100 rounded w-48"></div>
+                      <div className="h-3 bg-slate-100 rounded w-24"></div>
                     </div>
                   </div>
-                  <div className="h-8 bg-slate-200 rounded w-32"></div>
+                  <div className="h-8 bg-slate-100 rounded w-28"></div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* 2. Error State (Task 17) */}
+        {/* Error State */}
         {!loading && error && (
-          <div className="bg-white rounded-3xl border border-rose-200 p-12 text-center max-w-md mx-auto shadow-sm my-12">
+          <div className="bg-white rounded-3xl border border-rose-200 p-12 text-center max-w-md mx-auto shadow-card my-12">
             <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-7 h-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-1">Unable to load your cart.</h3>
-            <p className="text-sm text-slate-500 mb-6">{error}</p>
+            <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Unable to load shopping bag</h3>
+            <p className="text-xs text-slate-500 mb-6">{error}</p>
             <button
               onClick={fetchCart}
-              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition-colors cursor-pointer"
+              className="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" />
-              <span>Try Again</span>
+              Retry Load
             </button>
           </div>
         )}
 
-        {/* 3. Empty State (Task 17 & Specifications) */}
+        {/* Empty State */}
         {!loading && !error && cartItems.length === 0 && (
-          <div className="bg-white rounded-3xl border border-slate-200 p-12 sm:p-16 text-center max-w-lg mx-auto shadow-sm my-12">
-            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-              <ShoppingCart className="w-8 h-8" />
+          <div className="bg-white rounded-3xl border border-slate-200/80 p-12 sm:p-16 text-center max-w-md mx-auto shadow-card my-12">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
+              <ShoppingBag className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">
-              Your cart is empty 🛒
-            </h2>
-            <p className="text-sm text-slate-500 max-w-sm mx-auto mb-8 leading-relaxed">
-              Looks like you haven't added anything yet. Explore our product catalog and find something you love.
+            <h3 className="font-display text-xl font-bold text-slate-900">Your bag is empty</h3>
+            <p className="text-slate-500 text-xs mt-1.5 leading-relaxed">
+              Looks like you haven't added anything to your cart yet. Discover our curated collection today.
             </p>
             <Link
               to="/products"
-              className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+              className="mt-6 inline-flex items-center space-x-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-indigo-600 text-white text-xs font-bold transition-all shadow-sm"
             >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Browse Products</span>
+              <span>Explore Products</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         )}
 
-        {/* 4. Cart Content & Order Summary (Task 8) */}
+        {/* Cart Content: Items List + Order Summary */}
         {!loading && !error && cartItems.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Cart Items List */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+            {/* Items Column */}
             <div className="lg:col-span-8 space-y-4">
-              {cartItems.map((item) => (
-                <CartItem key={item.product?._id || item._id} item={item} />
-              ))}
+              {/* Free Delivery Bar */}
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-card">
+                <div className="flex items-center justify-between text-xs font-semibold mb-2">
+                  <div className="flex items-center space-x-1.5 text-slate-800">
+                    <Truck className="w-4 h-4 text-indigo-600" />
+                    {amountNeeded === 0 ? (
+                      <span className="text-emerald-600 font-bold">✨ You unlocked Free Express Delivery!</span>
+                    ) : (
+                      <span>Add <strong className="text-indigo-600">₹{amountNeeded.toLocaleString('en-IN')}</strong> more for Free Delivery</span>
+                    )}
+                  </div>
+                  <span className="text-slate-400 font-bold">{progressPercent}%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercent}%` }}
+                  ></div>
+                </div>
+              </div>
 
-              <div className="pt-2 flex justify-between items-center">
-                <Link
-                  to="/products"
-                  className="inline-flex items-center space-x-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Continue Shopping</span>
-                </Link>
+              {/* Items List */}
+              <div className="space-y-4">
+                {cartItems.map((item) => (
+                  <CartItem key={item._id} item={item} />
+                ))}
               </div>
             </div>
 
-            {/* Right Column: Order Summary (Task 15 Derived Values) */}
-            <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm sticky top-24">
-              <h2 className="text-lg font-bold text-slate-900 pb-4 border-b border-slate-100">
-                Order Summary
-              </h2>
+            {/* Sticky Summary Column */}
+            <div className="lg:col-span-4 sticky top-28 space-y-4">
+              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-card">
+                <h3 className="font-display text-lg font-bold text-slate-950 pb-4 border-b border-slate-100">
+                  Order Summary
+                </h3>
 
-              <div className="mt-6 space-y-3.5 text-sm">
-                <div className="flex justify-between text-slate-600">
-                  <span>Unique Items</span>
-                  <span className="font-semibold text-slate-800">{itemCount}</span>
+                <div className="py-4 space-y-3 text-xs text-slate-600">
+                  <div className="flex justify-between">
+                    <span>Subtotal ({totalUnits} items)</span>
+                    <span className="font-semibold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span>Estimated Shipping</span>
+                    <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-[11px]">
+                      {subtotal >= 999 ? 'FREE' : '₹99'}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span>Taxes</span>
+                    <span className="text-slate-500">Calculated at checkout</span>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
+                    <span className="font-display font-bold text-base text-slate-950">Estimated Total</span>
+                    <div className="text-right">
+                      <span className="font-display text-2xl font-black text-slate-950 tracking-tight">
+                        ₹{subtotal.toLocaleString('en-IN')}
+                      </span>
+                      <span className="text-[10px] text-slate-400 block">INR</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex justify-between text-slate-600">
-                  <span>Total Units</span>
-                  <span className="font-semibold text-slate-800">{totalUnits}</span>
-                </div>
-
-                <div className="flex justify-between text-slate-600">
-                  <span>Subtotal</span>
-                  <span className="font-bold text-slate-900">
-                    ₹{subtotal.toLocaleString('en-IN')}
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-slate-600">
-                  <span>Shipping</span>
-                  <span className="font-semibold text-emerald-600">FREE</span>
-                </div>
-
-                <div className="pt-4 border-t border-slate-200 flex justify-between items-baseline">
-                  <span className="text-base font-bold text-slate-900">Estimated Total</span>
-                  <span className="text-2xl font-extrabold text-blue-600">
-                    ₹{subtotal.toLocaleString('en-IN')}
-                  </span>
-                </div>
-              </div>
-
-              {/* Proceed to Checkout Action */}
-              <div className="mt-8">
                 <button
                   onClick={handleProceedToCheckout}
-                  disabled={checkingOut}
-                  className="w-full inline-flex items-center justify-center space-x-2 py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-500/25 transition-all cursor-pointer"
+                  className="w-full mt-4 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm tracking-wide shadow-glow-sm hover:shadow-glow transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer"
                 >
-                  <span>{checkingOut ? 'Preparing Order...' : 'Proceed to Checkout'}</span>
+                  <span>Proceed to Checkout</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
-              </div>
 
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center space-x-2 text-xs text-slate-500">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Encrypted & Secure 256-Bit Checkout</span>
+                <div className="mt-4 flex items-center justify-center space-x-2 text-[11px] text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Secured with 256-bit Razorpay encryption</span>
+                </div>
               </div>
             </div>
           </div>

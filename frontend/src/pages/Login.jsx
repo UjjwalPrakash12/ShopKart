@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShoppingCart, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { Sparkles, Mail, Lock, AlertCircle, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
 import { loginCustomer } from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
 
-  // Controlled component states
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -15,7 +14,6 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -25,7 +23,6 @@ const Login = () => {
     if (errorMessage) setErrorMessage('');
   };
 
-  // Handle login submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -42,13 +39,10 @@ const Login = () => {
         email: formData.email.trim(),
         password: formData.password,
       });
-
-      // On success, navigate to protected /home
       navigate('/home');
     } catch (err) {
       console.error('Login failed:', err);
       if (err.response && err.response.status === 401) {
-        // Lab Requirement: Show "Invalid Credentials" on failure
         setErrorMessage('Invalid Credentials');
       } else if (err.response && err.response.data && err.response.data.message) {
         setErrorMessage(err.response.data.message);
@@ -61,59 +55,64 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#fafafa] relative overflow-hidden">
+      {/* Background Decorative Ambient Glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-transparent blur-[120px] rounded-full pointer-events-none"></div>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
         {/* Brand Header */}
-        <div className="flex justify-center">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/25">
-            <ShoppingCart className="w-7 h-7" />
+        <Link to="/home" className="inline-flex items-center space-x-2.5 group mb-6">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-900 text-white flex items-center justify-center shadow-lg shadow-indigo-950/20 group-hover:scale-105 transition-all">
+            <Sparkles className="w-5 h-5 text-indigo-300" />
           </div>
-        </div>
-        <h2 className="mt-4 text-center text-3xl font-extrabold tracking-tight text-slate-900">
-          Sign in to ShopKart
+          <span className="font-display text-2xl font-black tracking-tight text-slate-900">
+            SHOP<span className="text-indigo-600">KART</span>
+          </span>
+        </Link>
+        <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">
+          Welcome back
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-600">
-          Enter your credentials to access your customer dashboard
+        <p className="mt-1.5 text-xs sm:text-sm text-slate-500">
+          Sign in to access your curated shopping bag and orders
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 shadow-xl shadow-slate-200/50 sm:rounded-2xl sm:px-10 border border-slate-100">
-          
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-slate-200/80 shadow-card">
           {/* Error Alert Box */}
           {errorMessage && (
-            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start space-x-3 text-rose-800 text-sm animate-shake">
-              <AlertCircle className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
-              <span className="font-medium">{errorMessage}</span>
+            <div className="mb-6 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start space-x-2.5 text-rose-800 text-xs font-semibold animate-fade-in">
+              <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+              <span>{errorMessage}</span>
             </div>
           )}
 
-          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             {/* Email Field */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Email Address</label>
-              <div className="mt-1.5 relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="w-5 h-5" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700">Email Address</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Mail className="w-4 h-4" />
                 </div>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="john@gmail.com"
+                  placeholder="name@example.com"
                   required
-                  className="block w-full pl-10 pr-3 py-2.5 sm:text-sm rounded-lg border border-slate-300 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none focus:ring-2"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Password</label>
-              <div className="mt-1.5 relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="w-5 h-5" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700">Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
                 </div>
                 <input
                   type="password"
@@ -122,45 +121,47 @@ const Login = () => {
                   onChange={handleChange}
                   placeholder="••••••••"
                   required
-                  className="block w-full pl-10 pr-3 py-2.5 sm:text-sm rounded-lg border border-slate-300 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none focus:ring-2"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
                 />
               </div>
             </div>
 
             {/* Submit Button */}
-            <div>
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-slate-950 hover:bg-indigo-600 active:scale-[0.99] text-white font-bold text-xs tracking-wider uppercase shadow-sm hover:shadow-glow-sm transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-60"
               >
                 {loading ? (
-                  <span className="inline-flex items-center space-x-2">
-                    <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    <span>Authenticating...</span>
-                  </span>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Signing in...</span>
+                  </>
                 ) : (
-                  <span className="inline-flex items-center space-x-1.5">
-                    <span>Login</span>
+                  <>
+                    <span>Sign In</span>
                     <ArrowRight className="w-4 h-4" />
-                  </span>
+                  </>
                 )}
               </button>
             </div>
           </form>
 
           {/* Footer Link */}
-          <div className="mt-6 border-t border-slate-200 pt-6 text-center">
-            <p className="text-sm text-slate-600">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
-                Register here
+          <div className="mt-6 border-t border-slate-100 pt-6 text-center">
+            <p className="text-xs text-slate-500">
+              New to ShopKart?{' '}
+              <Link to="/register" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+                Create an account
               </Link>
             </p>
           </div>
+        </div>
+
+        <div className="mt-6 flex items-center justify-center space-x-1.5 text-[11px] text-slate-400">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          <span>Secured with HttpOnly Cookie Authentication</span>
         </div>
       </div>
     </div>

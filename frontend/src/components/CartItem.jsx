@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Minus, Trash2, Tag, AlertCircle } from 'lucide-react';
+import { Plus, Minus, Trash2, Tag, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const CartItem = ({ item }) => {
@@ -47,17 +47,17 @@ const CartItem = ({ item }) => {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
-      {/* Product Image & Info */}
+    <div className="p-4 sm:p-6 bg-white rounded-2xl border border-slate-200/80 shadow-card hover:shadow-elevated transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Product Image & Details */}
       <div className="flex items-center space-x-4 min-w-0 flex-1">
         <Link
           to={`/products/${product._id}`}
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200"
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-50 overflow-hidden flex-shrink-0 border border-slate-200/60 p-1"
         >
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover hover:scale-105 transition-transform"
+            className="w-full h-full object-cover rounded-xl hover:scale-105 transition-transform duration-300"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src =
@@ -68,15 +68,19 @@ const CartItem = ({ item }) => {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center space-x-2">
-            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">
-              <Tag className="w-3 h-3" />
-              <span>{product.category}</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
+              {product.category}
             </span>
+            {product.stock <= 5 && (
+              <span className="text-[10px] text-amber-600 font-semibold">
+                Only {product.stock} left
+              </span>
+            )}
           </div>
 
           <Link
             to={`/products/${product._id}`}
-            className="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors line-clamp-1 mt-1 block"
+            className="text-sm sm:text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors line-clamp-1 mt-1 block"
           >
             {product.name}
           </Link>
@@ -86,44 +90,44 @@ const CartItem = ({ item }) => {
           </p>
 
           {errorMessage && (
-            <p className="text-xs text-rose-600 font-medium mt-1 animate-shake">
+            <p className="text-xs text-rose-600 font-medium mt-1 animate-fade-in">
               {errorMessage}
             </p>
           )}
         </div>
       </div>
 
-      {/* Quantity Controls & Totals */}
+      {/* Stepper, Total & Remove */}
       <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-        {/* Quantity Controls: [-] N [+] */}
-        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-1">
+        {/* Quantity Stepper */}
+        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200/80 rounded-xl p-1">
           <button
             onClick={handleDecrement}
             disabled={isMinQuantity || updating}
             title={isMinQuantity ? 'Minimum quantity is 1' : 'Decrease quantity'}
-            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm"
+            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm active:scale-95"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
 
-          <span className="w-8 text-center text-sm font-bold text-slate-800">
-            {quantity}
+          <span className="w-8 text-center text-xs font-bold text-slate-900">
+            {updating ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto text-slate-500" /> : quantity}
           </span>
 
           <button
             onClick={handleIncrement}
             disabled={isMaxStock || updating}
             title={isMaxStock ? `Max stock (${product.stock}) reached` : 'Increase quantity'}
-            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm"
+            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Item Total Price */}
+        {/* Item Total */}
         <div className="text-right min-w-[90px]">
-          <span className="text-xs text-slate-400 block font-medium">Total</span>
-          <span className="text-lg font-extrabold text-slate-900">
+          <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Total</span>
+          <span className="font-display text-base sm:text-lg font-bold text-slate-950">
             ₹{itemTotal.toLocaleString('en-IN')}
           </span>
         </div>
@@ -132,8 +136,8 @@ const CartItem = ({ item }) => {
         <button
           onClick={handleRemove}
           disabled={updating}
-          title="Remove item"
-          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+          title="Remove from bag"
+          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer active:scale-95"
         >
           <Trash2 className="w-4 h-4" />
         </button>

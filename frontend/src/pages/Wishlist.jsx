@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, RefreshCw, AlertTriangle, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Heart, RefreshCw, AlertTriangle, ArrowRight, Compass } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import WishlistCard from '../components/WishlistCard';
 import { getWishlist, removeFromWishlist, getCustomerProfile } from '../services/api';
@@ -16,8 +16,7 @@ const Wishlist = () => {
   useEffect(() => {
     getCustomerProfile()
       .then((data) => setCustomer(data))
-      .catch((err) => {
-        // Unauthenticated users are redirected to login
+      .catch(() => {
         navigate('/login');
       });
   }, [navigate]);
@@ -46,102 +45,97 @@ const Wishlist = () => {
     fetchWishlist();
   }, []);
 
-  // Handle removing product from wishlist without page refresh
   const handleRemoveItem = async (productId) => {
     await removeFromWishlist(productId);
     setWishlist((prev) => prev.filter((item) => item._id !== productId));
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col">
       <Navbar customer={customer} onLogout={() => setCustomer(null)} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-4 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between pb-6 mb-8 border-b border-slate-200/80 gap-4">
           <div>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
-                <Heart className="w-4 h-4 fill-current" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                My Wishlist
-              </h1>
+            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-rose-600 mb-1">
+              <Heart className="w-4 h-4 fill-current" />
+              <span>Saved Items</span>
             </div>
-            <p className="text-sm text-slate-500 mt-1">
-              Products you have saved to purchase later
+            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+              My Wishlist
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Keep track of your favorite products and move them to your bag when you're ready.
             </p>
           </div>
 
-          <div className="mt-4 sm:mt-0 text-xs font-semibold text-slate-600 bg-white px-3.5 py-1.5 rounded-full border border-slate-200 self-start shadow-sm">
-            <span>{!loading ? `${wishlist.length} products saved` : 'Loading...'}</span>
+          <div className="text-xs font-bold text-slate-700 bg-white px-4 py-2 rounded-full border border-slate-200 self-start shadow-sm flex items-center space-x-1.5">
+            <span>{!loading ? `${wishlist.length} Items Saved` : 'Loading...'}</span>
           </div>
         </div>
 
-        {/* 1. Loading State (Task 7) */}
+        {/* Loading State */}
         {loading && (
-          <div className="space-y-6 my-8">
-            <div className="flex items-center justify-center space-x-2 text-sm text-blue-600 font-medium">
+          <div className="space-y-6 my-12 text-center">
+            <div className="inline-flex items-center space-x-2 text-xs font-semibold text-rose-600">
               <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Loading your wishlist...</span>
+              <span>Loading saved items...</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-slate-200 p-4 animate-pulse">
-                  <div className="aspect-square bg-slate-200 rounded-xl mb-4"></div>
-                  <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-slate-200 rounded w-1/2 mb-4"></div>
-                  <div className="h-6 bg-slate-200 rounded w-1/3"></div>
+                <div key={i} className="bg-white rounded-2xl border border-slate-200/80 p-4 animate-pulse shadow-card">
+                  <div className="aspect-[4/5] bg-slate-100 rounded-xl mb-4"></div>
+                  <div className="h-4 bg-slate-100 rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-slate-100 rounded w-1/2 mb-4"></div>
+                  <div className="h-6 bg-slate-100 rounded w-1/3"></div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* 2. Error State (Task 7) */}
+        {/* Error State */}
         {!loading && error && (
-          <div className="bg-white rounded-3xl border border-rose-200 p-12 text-center max-w-md mx-auto shadow-sm my-12">
+          <div className="bg-white rounded-3xl border border-rose-200 p-12 text-center max-w-md mx-auto shadow-card my-12">
             <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-7 h-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-1">Something went wrong.</h3>
-            <p className="text-sm text-slate-500 mb-6">{error}</p>
+            <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Failed to Load Wishlist</h3>
+            <p className="text-xs text-slate-500 mb-6">{error}</p>
             <button
               onClick={fetchWishlist}
-              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition-colors cursor-pointer"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-full bg-slate-950 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" />
-              <span>Try Again</span>
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry</span>
             </button>
           </div>
         )}
 
-        {/* 3. Empty Wishlist State (Task 7 & Specification) */}
+        {/* Empty State */}
         {!loading && !error && wishlist.length === 0 && (
-          <div className="bg-white rounded-3xl border border-slate-200 p-12 sm:p-16 text-center max-w-lg mx-auto shadow-sm my-12">
-            <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-              <Heart className="w-8 h-8 fill-current text-rose-500" />
+          <div className="bg-white rounded-3xl border border-slate-200/80 p-12 sm:p-16 text-center max-w-md mx-auto shadow-card my-12">
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
+              <Heart className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">
-              Your wishlist is empty
-            </h2>
-            <p className="text-sm text-slate-500 max-w-sm mx-auto mb-8 leading-relaxed">
-              Save products you love while browsing and find them here later when you are ready to shop.
+            <h3 className="font-display text-xl font-bold text-slate-900">Your wishlist is empty</h3>
+            <p className="text-slate-500 text-xs mt-1.5 leading-relaxed">
+              Explore our collection and click the heart icon on any product to save it for later.
             </p>
             <Link
               to="/products"
-              className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+              className="mt-6 inline-flex items-center space-x-2 px-6 py-3 rounded-full bg-slate-950 hover:bg-indigo-600 text-white text-xs font-bold transition-all shadow-sm"
             >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Browse Products</span>
-              <ArrowRight className="w-4 h-4" />
+              <Compass className="w-4 h-4" />
+              <span>Discover Products</span>
             </Link>
           </div>
         )}
 
-        {/* 4. Wishlist Grid (Task 6) */}
+        {/* Wishlist Grid */}
         {!loading && !error && wishlist.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {wishlist.map((product) => (
               <WishlistCard
                 key={product._id}
