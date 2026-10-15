@@ -1,0 +1,370 @@
+{
+  "info": {
+    "name": "ShopKart API - Labs 01 to 03",
+    "_postman_id": "shopkart-api-suite",
+    "description": "Collection of APIs for ShopKart Customer Authentication & Product Catalog",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Customer Auth",
+      "item": [
+        {
+          "name": "1. Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\",\n  \"phone\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/customers/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["customers", "register"]
+            }
+          }
+        },
+        {
+          "name": "2. Login Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/customers/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["customers", "login"]
+            }
+          }
+        },
+        {
+          "name": "3. Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/customers/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["customers", "me"]
+            }
+          }
+        },
+        {
+          "name": "4. Change Password (Bonus +10)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"john123\",\n  \"newPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/customers/change-password",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["customers", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "5. Logout Customer",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/customers/logout",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["customers", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products Catalog (Lab 03)",
+      "item": [
+        {
+          "name": "1. Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mechanical Keyboard\",\n  \"description\": \"RGB mechanical keyboard with blue switches.\",\n  \"price\": 2999,\n  \"category\": \"Electronics\",\n  \"image\": \"https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80\",\n  \"stock\": 10\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products"]
+            }
+          }
+        },
+        {
+          "name": "2. Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products"]
+            }
+          }
+        },
+        {
+          "name": "3. Search Products by Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/products?search=keyboard",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products"],
+              "query": [
+                { "key": "search", "value": "keyboard" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Filter Products by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/products?category=Electronics",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products"],
+              "query": [
+                { "key": "category", "value": "Electronics" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Search & Category Combined",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/products?search=keyboard&category=Electronics",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products"],
+              "query": [
+                { "key": "search", "value": "keyboard" },
+                { "key": "category", "value": "Electronics" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. Sort by Price Ascending (Bonus +10)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/products?sort=price_asc",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products"],
+              "query": [
+                { "key": "sort", "value": "price_asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Sort by Price Descending (Bonus +10)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/products?sort=price_desc",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products"],
+              "query": [
+                { "key": "sort", "value": "price_desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. Get Single Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/products/66d123abc456000000000001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["products", "66d123abc456000000000001"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wishlist (Lab 04)",
+      "item": [
+        {
+          "name": "1. Add to Wishlist",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/wishlist/66d123abc456000000000001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["wishlist", "66d123abc456000000000001"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Current User Wishlist",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/wishlist",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["wishlist"]
+            }
+          }
+        },
+        {
+          "name": "3. Remove from Wishlist",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/wishlist/66d123abc456000000000001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["wishlist", "66d123abc456000000000001"]
+            }
+          }
+        },
+        {
+          "name": "4. Toggle Wishlist (Bonus +10)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/wishlist/66d123abc456000000000001/toggle",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["wishlist", "66d123abc456000000000001", "toggle"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shopping Cart (Lab 05)",
+      "item": [
+        {
+          "name": "1. Add to Cart",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/cart/66d123abc456000000000001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["cart", "66d123abc456000000000001"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/cart",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "3. Update Quantity",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/cart/66d123abc456000000000001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["cart", "66d123abc456000000000001"]
+            }
+          }
+        },
+        {
+          "name": "4. Remove from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/cart/66d123abc456000000000001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["cart", "66d123abc456000000000001"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
