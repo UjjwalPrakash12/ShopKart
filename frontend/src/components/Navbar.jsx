@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, LogOut, User, Heart, Sparkles, Compass, Sun, Moon } from 'lucide-react';
+import { ShoppingBag, LogOut, User, Heart, Sparkles, Compass, Sun, Moon, Package } from 'lucide-react';
 import { logoutCustomer, getWishlist } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
-const Navbar = ({ customer, onLogout }) => {
+const Navbar = ({ customer: propCustomer, onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { totalUnits } = useCart();
   const { theme, toggleTheme, isDark } = useTheme();
+  const { customer: authCustomer, logout: authLogout } = useAuth();
+  const customer = propCustomer || authCustomer;
   const [wishlistCount, setWishlistCount] = useState(0);
 
   useEffect(() => {
@@ -41,6 +44,7 @@ const Navbar = ({ customer, onLogout }) => {
   const isHome = location.pathname === '/home' || location.pathname === '/';
   const isProducts = location.pathname.startsWith('/products');
   const isWishlist = location.pathname.startsWith('/wishlist');
+  const isOrders = location.pathname.startsWith('/orders');
   const isCart = location.pathname.startsWith('/cart');
   const isCheckout = location.pathname.startsWith('/checkout');
 
@@ -122,6 +126,20 @@ const Navbar = ({ customer, onLogout }) => {
                     </span>
                   )}
                 </Link>
+
+                {customer && (
+                  <Link
+                    to="/orders"
+                    className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                      isOrders
+                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-900'
+                    }`}
+                  >
+                    <Package className="w-3.5 h-3.5" />
+                    <span>Orders</span>
+                  </Link>
+                )}
               </div>
             </div>
 

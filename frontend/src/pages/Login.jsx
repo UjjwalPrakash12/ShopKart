@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Sparkles, Mail, Lock, AlertCircle, ArrowRight, Loader2, ShieldCheck, Sun, Moon } from 'lucide-react';
 import { loginCustomer } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { refreshUser } = useAuth();
   const { toggleTheme, isDark } = useTheme();
 
   const [formData, setFormData] = useState({
@@ -41,7 +44,9 @@ const Login = () => {
         email: formData.email.trim(),
         password: formData.password,
       });
-      navigate('/home');
+      await refreshUser();
+      const destination = location.state?.from?.pathname || '/home';
+      navigate(destination, { replace: true });
     } catch (err) {
       console.error('Login failed:', err);
       if (err.response && err.response.status === 401) {

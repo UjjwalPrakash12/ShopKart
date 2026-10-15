@@ -133,8 +133,7 @@ const Checkout = () => {
           try {
             await verifyPayment(verifyPayload);
             await fetchCart();
-            alert('🎉 Payment verified! Your order has been placed successfully.');
-            navigate('/home');
+            navigate('/orders?success=true');
           } catch (verErr) {
             console.error('Verification failed', verErr);
             setError('Payment verification failed on the server. Please contact support.');
