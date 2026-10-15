@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create Axios client configured with baseURL and withCredentials
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001',
   withCredentials: true, // Crucial: sends & receives HttpOnly cookies with cross-origin requests
   headers: {
     'Content-Type': 'application/json',
